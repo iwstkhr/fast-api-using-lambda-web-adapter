@@ -1,0 +1,16 @@
+FROM public.ecr.aws/docker/library/python:3.12-alpine AS base
+ENV APP_ROOT=/code
+COPY ./src/requirements.txt $APP_ROOT/
+RUN pip install --no-cache-dir --upgrade -r $APP_ROOT/requirements.txt
+
+FROM base AS dev
+ENV ENV=dev
+EXPOSE 8000
+CMD ["sh", "-c", "fastapi run $APP_ROOT/main.py --port 8000"]
+
+FROM base
+ENV ENV=prod
+EXPOSE 8080
+COPY ./src $APP_ROOT
+COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.8.4 /lambda-adapter /opt/extensions/lambda-adapter
+CMD ["sh", "-c", "fastapi run $APP_ROOT/main.py --port 8080"]

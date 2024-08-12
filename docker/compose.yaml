@@ -1,0 +1,10 @@
+services:
+  api:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile-web
+      target: dev
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../src:/code
